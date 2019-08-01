@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=Steampunk Gauge
+Comment=A face for the System Monitor widget that uses an old looking analog gauge
+Icon=tools-wizard
+
+Type=Service
+X-KDE-ServiceTypes=Plasma/SensorApplet
+X-KDE-ParentApp=org.kde.plasmashell
+X-KDE-PluginInfo-Author=Marco Martin
+X-KDE-PluginInfo-Email=mart@kde.org
+X-KDE-PluginInfo-License=LGPLv2+
+X-KDE-PluginInfo-Name=notmart.ksysguard.steampunkgauge
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=https://kde.org
+
+[Config]
+SupportsSensorsColors=true
+SupportsTotalSensor=true
+SupportsTextOnlySensors=true
