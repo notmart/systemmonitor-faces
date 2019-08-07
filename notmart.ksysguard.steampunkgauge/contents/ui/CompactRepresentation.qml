@@ -37,7 +37,7 @@ Item {
     Layout.minimumWidth: plasmoid.formFactor != PlasmaCore.Types.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
     Layout.minimumHeight: plasmoid.formFactor == PlasmaCore.Types.Vertical ? width : Kirigami.Units.gridUnit
 
-
+/*
     ParticleSystem {
         id: particles
         x: chart.width/4 * 3
@@ -76,7 +76,7 @@ Item {
             }
         }
     }
-
+*/
     PlasmaCore.Svg {
         id: gaugeSvg
         imagePath: Qt.resolvedUrl("gauge.svg")
