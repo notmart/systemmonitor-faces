@@ -127,10 +127,14 @@ Item {
             y: face.elementCenter("rotatecenter").y - height/2
             width: face.elementSize("pointer").width
             height: face.elementSize("pointer").height
-            rotation: 45 + (parseInt(sensor.data)/sensor.maxValue) * 270
+            property real sensorNumber: parseFloat(sensor.data)
+            rotation: Number.isNaN(sensorNumber) ? 45 : (45 + (sensorNumber/Math.max(sensorNumber, sensor.maxValue)) * 270)
+
             Behavior on rotation {
                 RotationAnimation {
-                    duration: Kirigami.Units.longDuration*10
+                    id: rotationAnim
+                    target: pointer
+                    duration: Kirigami.Units.longDuration * 8
                     easing.type: Easing.OutElastic
                 } 
             }
