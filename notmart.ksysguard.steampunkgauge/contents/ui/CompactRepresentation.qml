@@ -37,11 +37,11 @@ Item {
     Layout.minimumWidth: plasmoid.formFactor != PlasmaCore.Types.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
     Layout.minimumHeight: plasmoid.formFactor == PlasmaCore.Types.Vertical ? width : Kirigami.Units.gridUnit
 
-/*
+
     ParticleSystem {
         id: particles
-        x: chart.width/4 * 3
-        y: chart.height/4 * 3
+        x: face.x + (face.width/5 * 4)
+        y: face.y + (face.height/5 * 4)
         width: 1
         height: Kirigami.Units.gridUnit
         rotation: 135
@@ -58,11 +58,11 @@ Item {
             id: emitter
             anchors.fill: parent
             group: "steam"
-            emitRate: sensor.data && (parseInt(sensor.data)/sensor.maxValue) > 0.8 ? Math.round(1000 * (parseInt(sensor.data)/sensor.maxValue)) : 0
-            lifeSpan: 2000
-            size: particles.width / 20
+            emitRate: steamTimer.running && !steamOffTimer.running ? Math.round(face.width * sensor.sensorRate) : 0
+            lifeSpan: Math.min(chart.width, chart.height) * 6
+            size: 1
             sizeVariation: 5
-            endSize: 0
+            endSize: Kirigami.Units.gridUnit * 2
 
             shape: LineShape {
                
@@ -75,8 +75,19 @@ Item {
                 targetVariation: 2.5
             }
         }
+        Timer {
+            id: steamTimer
+            repeat: true
+            running: sensor.sensorRate > 0.8
+            interval: 8000
+            onTriggered: steamOffTimer.restart()
+        }
+        Timer {
+            id: steamOffTimer
+            interval: 2000
+        }
     }
-*/
+
     PlasmaCore.Svg {
         id: gaugeSvg
         imagePath: Qt.resolvedUrl("gauge.svg")
@@ -127,8 +138,7 @@ Item {
             y: face.elementCenter("rotatecenter").y - height/2
             width: face.elementSize("pointer").width
             height: face.elementSize("pointer").height
-            property real sensorNumber: parseFloat(sensor.data)
-            rotation: Number.isNaN(sensorNumber) ? 45 : (45 + (sensorNumber/Math.max(sensorNumber, sensor.maxValue)) * 270)
+            rotation: 45 + sensor.sensorRate * 270
 
             Behavior on rotation {
                 RotationAnimation {
@@ -144,13 +154,19 @@ Item {
             color: "black"
             x: face.elementCenter("label0").x - width/2
             y: face.elementCenter("label0").y - height/2
-            text: sensor.value
+            text: totalSensor.value
         }
     }
 
     KSGRD.Sensor {
-        id: sensor
+        id: totalSensor
         sensorId: plasmoid.configuration.totalSensor
+    }
+    KSGRD.Sensor {
+        id: sensor
+        property real sensorNumber: Number.isNaN(parseFloat(data)) ? 1 : parseFloat(data)
+        property real sensorRate: (sensorNumber/Math.max(sensorNumber, maxValue))
+        sensorId: plasmoid.configuration.sensorIds[0]
     }
 }
 
