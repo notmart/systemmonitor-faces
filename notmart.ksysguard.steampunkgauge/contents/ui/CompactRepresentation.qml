@@ -59,7 +59,8 @@ Item {
             anchors.fill: parent
             group: "steam"
             emitRate: steamTimer.running && !steamOffTimer.running ? Math.round(face.width * sensor.sensorRate) : 0
-            lifeSpan: Math.min(chart.width, chart.height) * 6
+            // Only if there is a background is allowed to exit from boundaries
+            lifeSpan: Math.min(chart.width, chart.height) *  (plasmoid.configuration.backgroundEnabled ? 12 : 6)
             size: 1
             sizeVariation: 5
             endSize: Kirigami.Units.gridUnit * 2
@@ -78,7 +79,7 @@ Item {
         Timer {
             id: steamTimer
             repeat: true
-            running: sensor.sensorRate > 0.8
+            running: plasmoid.nativeInterface.faceConfiguration.showSteam && sensor.sensorRate > 0.8
             interval: 8000
             onTriggered: steamOffTimer.restart()
         }

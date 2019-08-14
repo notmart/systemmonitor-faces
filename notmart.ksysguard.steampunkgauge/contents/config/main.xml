@@ -9,6 +9,9 @@
         <entry name="showLegend" type="Bool">
             <default>true</default>
         </entry>
+        <entry name="showSteam" type="Bool">
+            <default>true</default>
+        </entry>
     </group>
     
 </kcfg>
