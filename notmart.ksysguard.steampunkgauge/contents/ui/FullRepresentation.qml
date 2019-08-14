@@ -45,7 +45,7 @@ ColumnLayout
         level: 2
     }
 
-    CompactRepresentation {
+    Gauge {
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.minimumHeight: 5 * Kirigami.Units.gridUnit
