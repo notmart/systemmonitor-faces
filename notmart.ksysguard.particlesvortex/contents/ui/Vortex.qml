@@ -65,7 +65,7 @@ Item {
                 id: emitter
                 anchors.fill: parent
                 group: plasmoid.configuration.sensorIds[index]
-                emitRate: particleSensor.data ? Math.round(500 * (parseInt(particleSensor.data)/particleSensor.maxValue)) : 0
+                emitRate: particleSensor.value ? Math.round(500 * (parseInt(particleSensor.value)/particleSensor.maximum)) : 0
                 lifeSpan: 2000
                 size: particles.width / 20
                 sizeVariation: 3
@@ -94,7 +94,7 @@ Item {
         anchors.centerIn: parent
         visible: width <= chart.width
         level: 2
-        text: sensor.value
+        text: sensor.formattedValue
     }
     KSGRD.Sensor {
         id: sensor
