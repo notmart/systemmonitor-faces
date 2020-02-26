@@ -155,7 +155,7 @@ Item {
             color: "black"
             x: face.elementCenter("label0").x - width/2
             y: face.elementCenter("label0").y - height/2
-            text: totalSensor.value
+            text: totalSensor.formattedValue
         }
     }
 
@@ -165,8 +165,8 @@ Item {
     }
     KSGRD.Sensor {
         id: sensor
-        property real sensorNumber: Number.isNaN(parseFloat(data)) ? 1 : parseFloat(data)
-        property real sensorRate: (sensorNumber/Math.max(sensorNumber, maxValue))
+        property real sensorRate: value/Math.max(value, maximum) || 0
+
         sensorId: plasmoid.configuration.sensorIds[0]
     }
 }
