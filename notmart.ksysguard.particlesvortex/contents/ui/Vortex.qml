@@ -25,7 +25,7 @@ import QtQuick.Particles 2.0
 
 import org.kde.kirigami 2.8 as Kirigami
 
-import org.kde.ksgrd2 0.1 as KSGRD
+import org.kde.ksysguard.sensors 1.0 as Sensors
 import org.kde.quickcharts 1.0 as Charts
 
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -72,7 +72,7 @@ Item {
                 endSize: 0
 
 
-                KSGRD.Sensor {
+                Sensors.Sensor {
                     id: particleSensor
                     sensorId: plasmoid.configuration.sensorIds[index]
                 }
@@ -96,7 +96,7 @@ Item {
         level: 2
         text: sensor.formattedValue
     }
-    KSGRD.Sensor {
+    Sensors.Sensor {
         id: sensor
         sensorId: plasmoid.configuration.totalSensor
     }

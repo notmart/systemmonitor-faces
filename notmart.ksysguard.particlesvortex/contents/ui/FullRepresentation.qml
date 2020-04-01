@@ -24,7 +24,7 @@ import QtQuick.Layouts 1.1
 
 import org.kde.kirigami 2.8 as Kirigami
 
-import org.kde.ksgrd2 0.1 as KSGRD
+import org.kde.ksysguard.sensors 1.0 as Sensors
 import org.kde.quickcharts 1.0 as Charts
 
 ColumnLayout
@@ -53,11 +53,11 @@ ColumnLayout
         Layout.maximumHeight: Math.max(root.width, Layout.minimumHeight)
     }
 
-    KSGRD.ExtendedLegend {
+    Sensors.ExtendedLegend {
         Layout.fillWidth: true
         Layout.fillHeight: true
         visible: root.showLegend
-        sourceModel: KSGRD.SensorDataModel {
+        sourceModel: Sensors.SensorDataModel {
             sensors: plasmoid.configuration.sensorIds
         }
         colorSource: globalColorSource
