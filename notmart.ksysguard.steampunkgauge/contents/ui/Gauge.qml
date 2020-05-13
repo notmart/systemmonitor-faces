@@ -27,6 +27,8 @@ import QtQuick.Controls 2.2 as Controls
 import org.kde.kirigami 2.8 as Kirigami
 
 import org.kde.ksysguard.sensors 1.0 as Sensors
+import org.kde.ksysguard.faces 1.0 as Faces
+
 import org.kde.quickcharts 1.0 as Charts
 
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -34,8 +36,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 Item {
     id: chart
 
-    Layout.minimumWidth: plasmoid.formFactor != PlasmaCore.Types.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
-    Layout.minimumHeight: plasmoid.formFactor == PlasmaCore.Types.Vertical ? width : Kirigami.Units.gridUnit
+    Layout.minimumWidth: root.formFactor != Faces.SensorFace.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
+    Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? width : Kirigami.Units.gridUnit
 
 
     ParticleSystem {
@@ -60,7 +62,7 @@ Item {
             group: "steam"
             emitRate: steamTimer.running && !steamOffTimer.running ? Math.round(face.width * sensor.sensorRate) : 0
             // Only if there is a background is allowed to exit from boundaries
-            lifeSpan: Math.min(chart.width, chart.height) *  (plasmoid.configuration.backgroundEnabled ? 12 : 6)
+            lifeSpan: Math.min(chart.width, chart.height) * 6
             size: 1
             sizeVariation: 5
             endSize: Kirigami.Units.gridUnit * 2
@@ -79,7 +81,7 @@ Item {
         Timer {
             id: steamTimer
             repeat: true
-            running: plasmoid.nativeInterface.faceConfiguration.showSteam && sensor.sensorRate > 0.8
+            running: root.controller.faceConfiguration.showSteam && sensor.sensorRate > 0.8
             interval: 8000
             onTriggered: steamOffTimer.restart()
         }
@@ -161,13 +163,13 @@ Item {
 
     Sensors.Sensor {
         id: totalSensor
-        sensorId: plasmoid.configuration.totalSensor
+        sensorId: root.controller.totalSensors[0]
     }
     Sensors.Sensor {
         id: sensor
         property real sensorRate: value/Math.max(value, maximum) || 0
 
-        sensorId: plasmoid.configuration.sensorIds[0]
+        sensorId: root.controller.highPrioritySensorIds[0]
     }
 }
 

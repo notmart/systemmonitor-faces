@@ -1,0 +1,4 @@
+[Config]
+SupportsSensorsColors=true
+SupportsTotalSensor=true
+SupportsTextOnlySensors=true

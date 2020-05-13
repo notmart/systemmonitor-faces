@@ -26,19 +26,17 @@ import QtQuick.Particles 2.0
 import org.kde.kirigami 2.8 as Kirigami
 
 import org.kde.ksysguard.sensors 1.0 as Sensors
+import org.kde.ksysguard.faces 1.0 as Faces
 import org.kde.quickcharts 1.0 as Charts
-
-import org.kde.plasma.core 2.0 as PlasmaCore
 
 Item {
     id: chart
 
-    Layout.minimumWidth: plasmoid.formFactor != PlasmaCore.Types.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
-    Layout.minimumHeight: plasmoid.formFactor == PlasmaCore.Types.Vertical ? width : Kirigami.Units.gridUnit
-
+    Layout.minimumWidth: root.formFactor != Faces.SensorFace.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
+    Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? width : Kirigami.Units.gridUnit
 
     Repeater {
-        model: plasmoid.configuration.sensorIds.length
+        model: root.controller.highPrioritySensorIds.length
 
         ParticleSystem {
             id: particles
@@ -47,11 +45,11 @@ Item {
             height: width
 
             ImageParticle {
-                groups: [plasmoid.configuration.sensorIds[index]]
+                groups: [root.controller.highPrioritySensorIds[index]]
                 anchors.fill: parent
                 source: "qrc:///particleresources/glowdot.png"
                 colorVariation: 0.1
-                color: plasmoid.configuration.sensorColors[index]
+                color: root.controller.sensorColors[root.controller.highPrioritySensorIds[index]]
                 RotationAnimator on rotation {
                     from: 0
                     to: 360
@@ -64,7 +62,7 @@ Item {
             Emitter {
                 id: emitter
                 anchors.fill: parent
-                group: plasmoid.configuration.sensorIds[index]
+                group: root.controller.highPrioritySensorIds[index]
                 emitRate: particleSensor.value ? Math.round(500 * (parseInt(particleSensor.value)/particleSensor.maximum)) : 0
                 lifeSpan: 2000
                 size: particles.width / 20
@@ -74,7 +72,7 @@ Item {
 
                 Sensors.Sensor {
                     id: particleSensor
-                    sensorId: plasmoid.configuration.sensorIds[index]
+                    sensorId: root.controller.highPrioritySensorIds[index]
                 }
                 shape: EllipseShape {
                     fill: false
@@ -98,7 +96,7 @@ Item {
     }
     Sensors.Sensor {
         id: sensor
-        sensorId: plasmoid.configuration.totalSensor
+        sensorId: root.controller.faceConfiguration.totalSensors
     }
 }
 

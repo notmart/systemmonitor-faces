@@ -4,16 +4,11 @@ Comment=A face for the System Monitor widget that show values as intensity of a 
 Icon=tools-wizard
 
 Type=Service
-X-KDE-ServiceTypes=Plasma/SensorApplet
+X-KDE-ServiceTypes=KSysguard/SensorFace
 X-KDE-ParentApp=org.kde.plasmashell
 X-KDE-PluginInfo-Author=Marco Martin
 X-KDE-PluginInfo-Email=mart@kde.org
 X-KDE-PluginInfo-License=LGPLv2+
 X-KDE-PluginInfo-Name=notmart.ksysguard.particlesvortex
-X-KDE-PluginInfo-Version=1.4
+X-KDE-PluginInfo-Version=1.3
 X-KDE-PluginInfo-Website=https://kde.org
-
-[Config]
-SupportsSensorsColors=true
-SupportsTotalSensor=true
-SupportsTextOnlySensors=true

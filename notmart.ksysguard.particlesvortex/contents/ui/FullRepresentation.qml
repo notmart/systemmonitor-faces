@@ -25,46 +25,78 @@ import QtQuick.Layouts 1.1
 import org.kde.kirigami 2.8 as Kirigami
 
 import org.kde.ksysguard.sensors 1.0 as Sensors
+import org.kde.ksysguard.faces 1.0 as Faces
 import org.kde.quickcharts 1.0 as Charts
+import org.kde.quickcharts.controls 1.0 as ChartsControls
 
-ColumnLayout
-{
+Faces.SensorFace {
     id: root
+    readonly property bool showLegend: controller.faceConfiguration.showLegend
 
-    readonly property bool showLegend: plasmoid.nativeInterface.faceConfiguration.showLegend
+    contentItem: ColumnLayout {
 
-    // Arbitrary minimumWidth to make easier to align plasmoids in a predictable way
-    Layout.minimumWidth: Kirigami.Units.gridUnit * 8
+        // Arbitrary minimumWidth to make easier to align plasmoids in a predictable way
+        Layout.minimumWidth: Kirigami.Units.gridUnit * 8
 
-    Kirigami.Heading {
-        Layout.fillWidth: true
-        horizontalAlignment: Text.AlignHCenter
-        elide: Text.ElideRight
-        text: plasmoid.configuration.title
-        visible: text.length > 0
-        level: 2
-    }
-
-    Vortex {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.minimumHeight: 5 * Kirigami.Units.gridUnit
-        Layout.preferredHeight: 8 * Kirigami.Units.gridUnit
-        Layout.maximumHeight: Math.max(root.width, Layout.minimumHeight)
-    }
-
-    Sensors.ExtendedLegend {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        visible: root.showLegend
-        sourceModel: Sensors.SensorDataModel {
-            sensors: plasmoid.configuration.sensorIds
+        Kirigami.Heading {
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
+            text: root.controller.title
+            visible: text.length > 0
+            level: 2
         }
-        colorSource: globalColorSource
-        textOnlySensorIds: root.showLegend ? plasmoid.configuration.textOnlySensorIds : []
-    }
 
-    Item {
-        Layout.fillHeight: true
+        Vortex {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 5 * Kirigami.Units.gridUnit
+            Layout.preferredHeight: 8 * Kirigami.Units.gridUnit
+            Layout.maximumHeight: Math.max(root.width, Layout.minimumHeight)
+        }
+
+        ColumnLayout {
+                visible: root.showLegend
+                Kirigami.Heading {
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
+                    text: root.controller.title
+                    visible: text.length > 0
+                    level: 2
+                }
+
+                Item { Layout.fillWidth: true; Layout.fillHeight: true }
+
+                Repeater {
+                    model: root.controller.highPrioritySensorIds.concat(root.controller.lowPrioritySensorIds)
+
+                    ChartsControls.LegendDelegate {
+                        readonly property bool isTextOnly: index >= root.controller.highPrioritySensorIds.length
+
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: isTextOnly ? 0 : implicitHeight
+
+                        name: sensor.shortName
+                        value: sensor.formattedValue
+                        colorVisible: !isTextOnly
+                        color: !isTextOnly ? root.colorSource.map[modelData] : "transparent"
+
+                        layoutWidth: root.width
+                        valueWidth: Kirigami.Units.gridUnit * 2
+
+                        Sensors.Sensor {
+                            id: sensor
+                            sensorId: modelData
+                        }
+                    }
+                }
+
+                Item { Layout.fillWidth: true; Layout.fillHeight: true }
+            }
+
+        Item {
+            Layout.fillHeight: true
+        }
     }
 }
