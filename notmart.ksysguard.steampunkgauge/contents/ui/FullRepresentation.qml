@@ -57,14 +57,6 @@ Faces.SensorFace {
 
         ColumnLayout {
             visible: root.showLegend
-            Kirigami.Heading {
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-                elide: Text.ElideRight
-                text: root.controller.title
-                visible: text.length > 0
-                level: 2
-            }
 
             Item { Layout.fillWidth: true; Layout.fillHeight: true }
 
