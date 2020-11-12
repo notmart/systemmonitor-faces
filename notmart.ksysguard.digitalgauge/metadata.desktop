@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Digital Gauge
+Comment=A face for the System Monitor widget that uses an lcd looking gauge
+Icon=tools-wizard
+
+Type=Service
+X-KDE-ServiceTypes=KSysguard/SensorFace
+X-KDE-ParentApp=org.kde.plasmashell
+X-KDE-PluginInfo-Author=Marco Martin
+X-KDE-PluginInfo-Email=mart@kde.org
+X-KDE-PluginInfo-License=LGPLv2+
+X-KDE-PluginInfo-Name=notmart.ksysguard.digitalgauge
+X-KDE-PluginInfo-Version=1.7
+X-KDE-PluginInfo-Website=https://kde.org
