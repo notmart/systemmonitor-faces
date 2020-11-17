@@ -9,7 +9,7 @@
         <entry name="showLegend" type="Bool">
             <default>true</default>
         </entry>
-        <entry name="showSteam" type="Bool">
+        <entry name="glow" type="Bool">
             <default>true</default>
         </entry>
     </group>

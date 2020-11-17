@@ -39,6 +39,7 @@ Item {
 
     Layout.minimumWidth: root.formFactor != backgrounds.Sensorbackground.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
     Layout.minimumHeight: root.formFactor == backgrounds.Sensorbackground.Vertical ? width : Kirigami.Units.gridUnit
+    Layout.maximumHeight: width / gaugeSvg.ratio
 
 
     PlasmaCore.Svg {
@@ -46,128 +47,178 @@ Item {
         imagePath: Qt.resolvedUrl("gauge.svg")
         property real ratio
         onRepaintNeeded: {
-            ratio = gaugeSvg.elementRect("foreground").width / gaugeSvg.elementRect("foreground").height
+            ratio = gaugeSvg.elementSize("hint-boundingrect").width / gaugeSvg.elementSize("hint-boundingrect").height
         }
     }
 
     PlasmaCore.SvgItem {
-        id: foreground
-        readonly property real chartRatio: chart.width / chart.height
-        width: chartRatio <= gaugeSvg.ratio ? chart.width : height * gaugeSvg.ratio
-        height: chartRatio <= gaugeSvg.ratio ? width / gaugeSvg.ratio : chart.height
+        id: background
+        width: foreground.width
+        height: foreground.height
 
-        anchors.centerIn: parent
+        anchors.horizontalCenter: parent.horizontalCenter
         svg: gaugeSvg
-        elementId: "foreground"
-        readonly property real ratioX: foreground.width/gaugeSvg.elementRect("foreground").width
-        readonly property real ratioY: foreground.height/gaugeSvg.elementRect("foreground").height
+        elementId: "background"
+    }
 
-        function elementPos(element) {
-            var rect = gaugeSvg.elementRect(element);
-            return Qt.point(rect.x * ratioX, rect.y * ratioY);
+    Item {
+        id: renderParent
+        anchors {
+            left: parent.left
+            top: parent.top
+            right: parent.right
+        }
+        height:  parent.height * gaugeSvg.ratio
+        //layer.enabled: true
+
+        PlasmaCore.SvgItem {
+            id: foreground
+            visible: false
+            width: Math.min(parent.width, parent.height)
+            height: width
+
+            anchors {
+                top: parent.top
+                horizontalCenter: parent.horizontalCenter
+            }
+            svg: gaugeSvg
+            elementId: "foreground"
+            readonly property real ratioX: foreground.width/gaugeSvg.elementRect("foreground").width
+            readonly property real ratioY: foreground.height/gaugeSvg.elementRect("foreground").height
+
+            function elementPos(element) {
+                var rect = gaugeSvg.elementRect(element);
+                return Qt.point(rect.x * ratioX, rect.y * ratioY);
+            }
+
+            function elementCenter(element) {
+                var rect = gaugeSvg.elementRect(element);
+                return Qt.point(rect.x * ratioX + (rect.width * ratioX)/2, rect.y * ratioY + (rect.height * ratioY)/2);
+            }
+
+            function elementSize(element) {
+                var rect = gaugeSvg.elementRect(element);
+                return Qt.size(rect.width * ratioX, rect.height * ratioY);
+            }
         }
 
-        function elementCenter(element) {
-            var rect = gaugeSvg.elementRect(element);
-            return Qt.point(rect.x * ratioX + (rect.width * ratioX)/2, rect.y * ratioY + (rect.height * ratioY)/2);
+        ChartControls.PieChartControl {
+            id: pie
+            visible: false
+            anchors.fill: foreground
+            property alias sensors: sensorsModel.sensors
+            property alias sensorsModel: sensorsModel
+
+            Layout.minimumWidth: root.formFactor != Faces.SensorFace.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
+            Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? width : Kirigami.Units.gridUnit
+
+            leftPadding: 0
+            rightPadding: 0
+            topPadding: 0
+            bottomPadding: 0
+            chart.smoothEnds: false
+            chart.fromAngle: -110
+            chart.toAngle: 110
+            //chart.thickness: 80
+            chart.filled: true
+
+            range {
+                from: root.controller.faceConfiguration.rangeFrom
+                to: root.controller.faceConfiguration.rangeTo
+                automatic: root.controller.faceConfiguration.rangeAuto
+            }
+
+            text: root.controller.totalSensors.length == 1 ? sensor.formattedValue : ""
+
+            valueSources: Charts.ModelSource {
+                model: Sensors.SensorDataModel {
+                    id: sensorsModel
+                    sensors: root.controller.highPrioritySensorIds
+                }
+                roleName: "Value"
+                indexColumns: true
+            }
+            chart.nameSource: Charts.ModelSource {
+                roleName: "Name";
+                model: valueSources[0].model;
+                indexColumns: true
+            }
+            chart.shortNameSource: Charts.ModelSource {
+                roleName: "ShortName";
+                model: valueSources[0].model;
+                indexColumns: true
+            }
+            chart.colorSource: root.colorSource
         }
 
-        function elementSize(element) {
-            var rect = gaugeSvg.elementRect(element);
-            return Qt.size(rect.width * ratioX, rect.height * ratioY);
+        OpacityMask {
+            cached: true
+            anchors.fill: foreground
+            source: pie
+            maskSource: foreground
         }
-/*
-        Repeater {
-            id: handleRepeater
-            model: root.controller.highPrioritySensorIds
-            PlasmaCore.SvgItem {
-                id: pointer
-                svg: gaugeSvg
-                elementId: "pointer"
-                transformOrigin: Item.Top
 
-                x: foreground.elementCenter("rotatecenter").x - width/2
-                y: foreground.elementCenter("rotatecenter").y //- height/2
-                width: foreground.elementSize("pointer").width
-                height: foreground.elementSize("pointer").height
-                // only 7.5 degrees increments
-                rotation: index === 0
-                    ? Math.round((75 + sensor.sensorRate * 210) / 7.5) * 7.5
-                    : Math.round(( sensor.sensorRate * 210 + foreground.children[index-1].rotation) / 7.5) * 7.5
-                Sensors.Sensor {
-                    id: sensor
-                    property real sensorRate: value/Math.max(value, maximum) || 0
+        Item {
+            id: pointersContainer
+            anchors.fill: foreground
+            Repeater {
+                id: handleRepeater
+                model: root.controller.highPrioritySensorIds
+                Item {
+                    x: foreground.elementCenter("rotatecenter").x - width/2
+                    y: foreground.elementCenter("rotatecenter").y //- height/2
+                    width: foreground.elementSize("pointer").width
+                    height: foreground.elementSize("pointer").height
+                    transformOrigin: Item.Top
+                    // only 7.5 degrees increments
+                    rotation: index === 0
+                        ? Math.round((75 + sensor.sensorRate * 210) / 7.5) * 7.5
+                        : Math.round((sensor.sensorRate * 210 + pointersContainer.children[index-1].rotation) / 7.5) * 7.5
+                    Sensors.Sensor {
+                        id: sensor
+                        property real sensorRate: value/Math.max(value, maximum) || 0
 
-                    sensorId: modelData
+                        sensorId: modelData
+                    }
+
+                    PlasmaCore.SvgItem {
+                        id: pointerSvg
+                        visible: false
+                        anchors.fill: parent
+                        svg: gaugeSvg
+                        elementId: "pointer"
+                    }
+                    Rectangle {
+                        id: handColor
+                        visible: false
+                        anchors.fill: parent
+                        color: root.colorSource.map[modelData]
+                    }
+                    OpacityMask {
+                        cached: true
+                        anchors.fill: parent
+                        source: handColor
+                        maskSource: pointerSvg
+                    }
                 }
             }
-        }*/
 
-        Controls.Label {
-            color: "black"
-            x: foreground.elementCenter("label0").x - width/2
-            y: foreground.elementCenter("label0").y - height/2
-            text: totalSensor.formattedValue
-        }
-    }
-
-    ChartControls.PieChartControl {
-        id: pie
-        visible: false
-        anchors.fill: foreground
-        property alias sensors: sensorsModel.sensors
-        property alias sensorsModel: sensorsModel
-
-        Layout.minimumWidth: root.formFactor != Faces.SensorFace.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
-        Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? width : Kirigami.Units.gridUnit
-
-        leftPadding: 0
-        rightPadding: 0
-        topPadding: 0
-        bottomPadding: 0
-        chart.smoothEnds: false
-        chart.fromAngle: -110
-        chart.toAngle: 110
-        //chart.thickness: 80
-        chart.filled: true
-
-        range {
-            from: root.controller.faceConfiguration.rangeFrom
-            to: root.controller.faceConfiguration.rangeTo
-            automatic: root.controller.faceConfiguration.rangeAuto
-        }
-
-        chart.backgroundColor: Qt.rgba(0.0, 0.0, 0.0, 0.3)
-
-        text: root.controller.totalSensors.length == 1 ? sensor.formattedValue : ""
-
-        valueSources: Charts.ModelSource {
-            model: Sensors.SensorDataModel {
-                id: sensorsModel
-                sensors: root.controller.highPrioritySensorIds
+            Controls.Label {
+                color: root.controller.highPrioritySensorIds.length > 0 ? root.colorSource.map[root.controller.highPrioritySensorIds[0]] : Kirigami.Theme.highlightColor
+                x: foreground.elementCenter("label0").x - width/2
+                y: foreground.elementCenter("label0").y - height/2
+                text: totalSensor.formattedValue
+                font.pixelSize: foreground.elementSize("label0").height
             }
-            roleName: "Value"
-            indexColumns: true
         }
-        chart.nameSource: Charts.ModelSource {
-            roleName: "Name";
-            model: valueSources[0].model;
-            indexColumns: true
-        }
-        chart.shortNameSource: Charts.ModelSource {
-            roleName: "ShortName";
-            model: valueSources[0].model;
-            indexColumns: true
-        }
-        chart.colorSource: root.colorSource
     }
 
-
-    OpacityMask {
-        cached: true
-        anchors.fill: pie
-        source: pie
-        maskSource: foreground
+    FastBlur {
+        z: -1
+        visible: controller.faceConfiguration.glow
+        anchors.fill: renderParent
+        source: renderParent
+        radius: Kirigami.Units.gridUnit/2
     }
 
     Sensors.Sensor {

@@ -30,15 +30,15 @@ Kirigami.FormLayout {
     id: root
 
     property alias cfg_showLegend: showSensorsLegendCheckbox.checked
-    property alias cfg_showSteam: showSteamCheckbox.checked
+    property alias cfg_glow: glowCheckbox.checked
 
     Controls.CheckBox {
         id: showSensorsLegendCheckbox
         text: i18n("Show Sensors Legend")
     }
     Controls.CheckBox {
-        id: showSteamCheckbox
-        text: i18n("Blow Steam When Maxed Out")
+        id: glowCheckbox
+        text: i18n("Glow")
     }
 }
 

@@ -34,7 +34,7 @@ Faces.SensorFace {
     id: root
     readonly property bool showLegend: controller.faceConfiguration.showLegend
 
-    contentItem: ColumnLayout{
+    contentItem: ColumnLayout {
         // Arbitrary minimumWidth to make easier to align plasmoids in a predictable way
         Layout.minimumWidth: Kirigami.Units.gridUnit * 8
 
@@ -51,8 +51,6 @@ Faces.SensorFace {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 5 * Kirigami.Units.gridUnit
-            Layout.preferredHeight: 8 * Kirigami.Units.gridUnit
-            Layout.maximumHeight: Math.max(root.width, Layout.minimumHeight)
         }
 
         ColumnLayout {
